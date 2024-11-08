@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "sync"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  email       String        @unique
+  name        String
+  password    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  active      Boolean       @default(true)
+  Files       Files[]
+  FileSigns   FileSigns[]
+  UsersToSign UsersToSign[]
+  Session     Session[]
+
+  @@map("users")
+}
+
+model Files {
+  id          String        @id @default(uuid())
+  ownerId     String
+  owner       User          @relation(fields: [ownerId], references: [id])
+  path        String
+  FileSigns   FileSigns[]
+  UsersToSign UsersToSign[]
+
+  @@map("files")
+}
+
+model FileSigns {
+  id        String   @id @default(uuid())
+  fileId    String
+  file      Files    @relation(fields: [fileId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  signed_at DateTime @default(now())
+  sig_token String
+
+  @@map("file_signs")
+}
+
+model UsersToSign {
+  fileId    String
+  file      Files   @relation(fields: [fileId], references: [id])
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  is_signed Boolean
+
+  @@id([fileId, userId])
+  @@map("users_to_sign")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("sessions")
+}

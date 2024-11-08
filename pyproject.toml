@@ -1,0 +1,14 @@
+[project]
+name = "assinarpdf"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.0.3",
+    "pdfkit>=1.0.0",
+    "prisma>=0.15.0",
+    "pyjwt>=2.9.0",
+    "pypdf2>=3.0.1",
+    "reportlab>=4.2.5",
+]
